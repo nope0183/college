@@ -1,1 +1,258 @@
 @import "tailwindcss";
+
+:root {
+  --paper: #f2f4f1;
+  --paper-2: #e8ece7;
+  --card: #fbfcfa;
+  --ink: #0b2033;
+  --ink-2: #4a5c6e;
+  --navy: #0e2a47;
+  --navy-deep: #07192c;
+  --accent: #ff6b1f;
+  --accent-2: #ffb020;
+  --line: rgba(14, 42, 71, 0.15);
+  --line-paper: rgba(242, 244, 241, 0.16);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink-2);
+  --color-navy: var(--navy);
+  --color-navydeep: var(--navy-deep);
+  --color-accent: var(--accent);
+  --color-amber2: var(--accent-2);
+  --color-line: var(--line);
+  --color-linepaper: var(--line-paper);
+  --font-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --font-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+section[id],
+div[id] {
+  scroll-margin-top: 72px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--navy-deep);
+}
+
+/* ---------- фоновые фактуры ---------- */
+.bg-blueprint {
+  background-image:
+    linear-gradient(var(--line-paper) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-paper) 1px, transparent 1px),
+    linear-gradient(rgba(255, 176, 32, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 176, 32, 0.05) 1px, transparent 1px);
+  background-size:
+    44px 44px,
+    44px 44px,
+    220px 220px,
+    220px 220px;
+}
+
+.bg-blueprint-light {
+  background-image:
+    linear-gradient(rgba(14, 42, 71, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 42, 71, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.noise-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.text-stroke {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(242, 244, 241, 0.14);
+}
+
+/* ---------- reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- keyframes ---------- */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 30s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.12) translate(1.6%, -1.6%);
+  }
+}
+.kenburns {
+  animation: kenburns 16s ease-in-out infinite alternate;
+}
+
+@keyframes blinkdot {
+  50% {
+    opacity: 0.25;
+  }
+}
+.dot-live {
+  animation: blinkdot 1.6s ease-in-out infinite;
+}
+
+@keyframes scrollcue {
+  0% {
+    transform: translateY(-110%);
+  }
+  55%,
+  100% {
+    transform: translateY(110%);
+  }
+}
+.scroll-cue-inner {
+  animation: scrollcue 1.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes floaty {
+  50% {
+    transform: translateY(-9px);
+  }
+}
+.floaty {
+  animation: floaty 5s ease-in-out infinite;
+}
+
+@keyframes dashmove {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+.dash-anim {
+  animation: dashmove 1.6s linear infinite;
+}
+
+/* ---------- версия для слабовидящих ---------- */
+html.av-size-2 {
+  font-size: 115%;
+}
+html.av-size-3 {
+  font-size: 130%;
+}
+html.av-ls-2 body {
+  letter-spacing: 0.025em;
+}
+html.av-ls-3 body {
+  letter-spacing: 0.05em;
+  line-height: 1.85;
+}
+html.av-font-serif,
+html.av-font-serif * {
+  font-family: "Times New Roman", Times, serif !important;
+}
+html.av-font-sans,
+html.av-font-sans * {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+html.av-scheme-light {
+  --paper: #ffffff;
+  --paper-2: #f1f1f1;
+  --card: #ffffff;
+  --ink: #000000;
+  --ink-2: #1c1c1c;
+  --navy: #111111;
+  --navy-deep: #000000;
+  --accent: #b45309;
+  --accent-2: #7c2d12;
+  --line: rgba(0, 0, 0, 0.5);
+  --line-paper: rgba(255, 255, 255, 0.4);
+}
+html.av-scheme-dark {
+  --paper: #0a0a0a;
+  --paper-2: #131313;
+  --card: #0f0f0f;
+  --ink: #ffffff;
+  --ink-2: #d8d8d8;
+  --navy: #141414;
+  --navy-deep: #000000;
+  --accent: #ffd400;
+  --accent-2: #ffd400;
+  --line: rgba(255, 255, 255, 0.35);
+  --line-paper: rgba(255, 255, 255, 0.22);
+}
+html.av-scheme-beige {
+  --paper: #f3e9d2;
+  --paper-2: #eadfc2;
+  --card: #f8f0dc;
+  --ink: #5b4223;
+  --ink-2: #7a5e3b;
+  --navy: #5b4223;
+  --navy-deep: #46331b;
+  --accent: #a05e00;
+  --accent-2: #8a5a00;
+  --line: rgba(91, 66, 35, 0.4);
+  --line-paper: rgba(243, 233, 210, 0.3);
+}
+html.av-noimg img {
+  filter: grayscale(1) contrast(1.08) !important;
+}
+html.av .noise-layer {
+  display: none;
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .marquee-track,
+  .kenburns,
+  .floaty,
+  .scroll-cue-inner,
+  .dash-anim {
+    animation: none !important;
+  }
+}
