@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Ref } from "react";
+import { Link } from "react-router-dom";
 import { IMG, STATS, TICKER } from "../data";
 import { useCountUp, useCountdown, useInView, useScramble } from "../hooks";
 import { Marquee, Reveal, SectionHead } from "../ui";
@@ -68,17 +69,13 @@ export function Opening() {
 
           <Reveal delay={280}>
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a
-                href="#programs"
-                onClick={(e) => {
-                  e.preventDefault();
-                  smoothScroll("#programs");
-                }}
+              <Link
+                to="/programmy"
                 className="group flex items-center gap-3 rounded bg-accent px-7 py-4 font-display text-[13px] font-bold text-navy-deep transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber2"
               >
                 Выбрать специальность
                 <IconArrowRight className="h-4.5 w-4.5 transition-transform duration-300 group-hover:translate-x-1" />
-              </a>
+              </Link>
               <a
                 href="#events"
                 onClick={(e) => {

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   ADMISSION_LINKS,
   CONTACTS,
@@ -6,7 +8,6 @@ import {
   NAV,
   NEWS,
   PROGRAMS,
-  AUDIENCES,
 } from "../data";
 import {
   IconArrowUpRight,
@@ -40,20 +41,6 @@ export const AV_DEFAULT: AvState = {
   images: true,
 };
 
-function goAnchor(href: string) {
-  const el = document.querySelector(href);
-  if (!el) return;
-  const prm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: prm ? "auto" : "smooth", block: "start" });
-}
-
-function navClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-  if (href.startsWith("#")) {
-    e.preventDefault();
-    goAnchor(href);
-  }
-}
-
 /* ================= Верхняя служебная панель ================= */
 
 export function TopBar({
@@ -61,7 +48,7 @@ export function TopBar({
   setAv,
 }: {
   av: AvState;
-  setAv: React.Dispatch<React.SetStateAction<AvState>>;
+  setAv: Dispatch<SetStateAction<AvState>>;
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
 
@@ -217,7 +204,7 @@ export function Header() {
   return (
     <header className="border-b border-line bg-paper">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-10 gap-y-4 px-4 py-5 sm:px-6">
-        <a href="#top" onClick={(e) => navClick(e, "#top")} className="group flex items-center gap-4">
+        <Link to="/" className="group flex items-center gap-4">
           <IconLogo className="h-12 w-12 shrink-0 transition-transform duration-500 group-hover:rotate-[18deg]" />
           <div>
             <p className="font-display text-[15px] leading-tight font-bold text-ink sm:text-base">
@@ -227,14 +214,14 @@ export function Header() {
               ГБПОУ МО · Профессионалитет
             </p>
           </div>
-        </a>
+        </Link>
 
         <div className="ml-auto hidden items-center gap-7 text-[13.5px] md:flex">
-          <a href={CONTACTS.phoneHref} className="group flex items-center gap-2.5 text-ink transition-colors hover:text-accent">
+          <a href={CONTACTS.phoneHref} className="flex items-center gap-2.5 text-ink transition-colors hover:text-accent">
             <IconPhone className="h-4.5 w-4.5 text-accent" />
             <span className="font-semibold">{CONTACTS.phone}</span>
           </a>
-          <a href={`mailto:${CONTACTS.email}`} className="group flex items-center gap-2.5 text-ink2 transition-colors hover:text-accent">
+          <a href={`mailto:${CONTACTS.email}`} className="flex items-center gap-2.5 text-ink2 transition-colors hover:text-accent">
             <IconMail className="h-4.5 w-4.5 text-accent" />
             {CONTACTS.email}
           </a>
@@ -244,9 +231,8 @@ export function Header() {
           </div>
         </div>
 
-        <a
-          href="#steps"
-          onClick={(e) => navClick(e, "#steps")}
+        <Link
+          to="/abiturientu"
           className="group relative ml-auto overflow-hidden rounded bg-navy px-6 py-3.5 font-display text-[12px] font-bold tracking-wide text-paper transition-colors hover:bg-navy-deep md:ml-0"
         >
           <span className="relative z-10">Подать заявление</span>
@@ -254,7 +240,7 @@ export function Header() {
           <span className="absolute inset-0 z-10 flex items-center justify-center font-display text-[12px] font-bold tracking-wide text-navy-deep opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             Подать заявление
           </span>
-        </a>
+        </Link>
       </div>
     </header>
   );
@@ -282,15 +268,27 @@ export function NavBar({ onSearch }: { onSearch: () => void }) {
       <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 sm:px-6">
         <div className="hidden items-center lg:flex">
           {NAV.map((n) => (
-            <a
-              key={n.href}
-              href={n.href}
-              onClick={(e) => navClick(e, n.href)}
-              className="group relative px-3.5 py-4 text-[13.5px] font-medium text-paper/85 transition-colors hover:text-amber2"
+            <NavLink
+              key={n.path}
+              to={n.path}
+              end={n.path === "/"}
+              className={({ isActive }) =>
+                `group relative px-3.5 py-4 text-[13.5px] font-medium transition-colors ${
+                  isActive ? "text-amber2" : "text-paper/85 hover:text-amber2"
+                }`
+              }
             >
-              {n.label}
-              <span className="absolute inset-x-3.5 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover:scale-x-100" />
-            </a>
+              {({ isActive }) => (
+                <>
+                  {n.label}
+                  <span
+                    className={`absolute inset-x-3.5 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-300 ${
+                      isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    }`}
+                  />
+                </>
+              )}
+            </NavLink>
           ))}
         </div>
 
@@ -321,29 +319,28 @@ export function NavBar({ onSearch }: { onSearch: () => void }) {
           </div>
           <div className="flex flex-col overflow-y-auto py-4">
             {NAV.map((n, i) => (
-              <a
-                key={n.href}
-                href={n.href}
-                onClick={(e) => {
-                  navClick(e, n.href);
-                  setMenuOpen(false);
-                }}
-                className="flex items-center justify-between border-b border-paper/8 px-5 py-4 transition-colors hover:bg-paper/5 hover:text-amber2"
+              <NavLink
+                key={n.path}
+                to={n.path}
+                end={n.path === "/"}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center justify-between border-b border-paper/10 px-5 py-4 transition-colors hover:bg-paper/5 hover:text-amber2 ${
+                    isActive ? "text-amber2" : ""
+                  }`
+                }
               >
                 <span className="font-display text-lg font-semibold">{n.label}</span>
                 <span className="font-mono text-[11px] text-paper/40">0{i + 1}</span>
-              </a>
+              </NavLink>
             ))}
-            <a
-              href="#steps"
-              onClick={(e) => {
-                navClick(e, "#steps");
-                setMenuOpen(false);
-              }}
+            <Link
+              to="/abiturientu"
+              onClick={() => setMenuOpen(false)}
               className="mx-5 mt-6 rounded bg-accent px-5 py-4 text-center font-display text-sm font-bold text-navy-deep"
             >
               Подать заявление
-            </a>
+            </Link>
             <div className="mt-6 space-y-2 px-5 text-sm text-paper/70">
               <a href={CONTACTS.phoneHref} className="block hover:text-amber2">{CONTACTS.phone}</a>
               <a href={`mailto:${CONTACTS.email}`} className="block hover:text-amber2">{CONTACTS.email}</a>
@@ -357,15 +354,12 @@ export function NavBar({ onSearch }: { onSearch: () => void }) {
 
 /* ================= Поиск ================= */
 
-interface SearchEntry {
-  type: string;
-  label: string;
-  href: string;
-}
+type SearchEntry = { type: string; label: string; to?: string; href?: string };
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open) {
@@ -384,14 +378,17 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
   const index = useMemo<SearchEntry[]>(
     () => [
-      ...NAV.map((n) => ({ type: "Раздел", label: n.label, href: n.href })),
-      ...PROGRAMS.map((p) => ({ type: "Специальность", label: `${p.code} — ${p.title}`, href: "#programs" })),
-      ...NEWS.map((n) => ({ type: "Новость", label: n.title, href: "#news" })),
-      ...ADMISSION_LINKS.map((l) => ({ type: "Абитуриенту", label: l.label, href: l.href })),
-      ...DEPARTMENTS.map((l) => ({ type: "Сведения", label: l.label, href: l.href })),
-      ...AUDIENCES.flatMap((a) => a.links.map((l) => ({ type: a.label, label: l.label, href: l.href }))),
-      { type: "Раздел", label: "Контакты и карта", href: "#contacts" },
-      { type: "Раздел", label: "Дни открытых дверей", href: "#events" },
+      ...NAV.map((n) => ({ type: "Раздел", label: n.label, to: n.path })),
+      ...PROGRAMS.map((p) => ({ type: "Специальность", label: `${p.code} — ${p.title}`, to: "/programmy" })),
+      ...NEWS.map((n) => ({ type: "Новость", label: n.title, to: `/novosti/${n.id}` })),
+      { type: "Абитуриенту", label: "Правила приёма (PDF)", href: ADMISSION_LINKS[3].href },
+      { type: "Абитуриенту", label: "Документы для поступления (PDF)", href: ADMISSION_LINKS[0].href },
+      { type: "Абитуриенту", label: "Инструкция по подаче через ЕПГУ (PDF)", href: ADMISSION_LINKS[6].href },
+      { type: "Абитуриенту", label: "Общежитие", href: ADMISSION_LINKS[8].href },
+      ...DEPARTMENTS.map((l) => ({ type: "Сведения", label: l.label, to: "/svedeniya" })),
+      { type: "Раздел", label: "Дни открытых дверей", to: "/abiturientu" },
+      { type: "Раздел", label: "Расписание звонков", to: "/studentu" },
+      { type: "Раздел", label: "Контакты и карта", to: "/kontakty" },
     ],
     [],
   );
@@ -404,8 +401,13 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
   if (!open) return null;
 
+  const goTo = (e: SearchEntry) => {
+    onClose();
+    if (e.to) setTimeout(() => navigate(e.to as string), 60);
+  };
+
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-navydeep/98 text-paper">
+    <div className="fixed inset-0 z-[80] flex flex-col bg-navydeep/[0.98] text-paper">
       <div className="mx-auto w-full max-w-4xl px-4 sm:px-6">
         <div className="flex items-center gap-4 border-b border-paper/15 py-6">
           <IconSearch className="h-6 w-6 shrink-0 text-amber2" />
@@ -423,7 +425,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
         <div className="max-h-[65vh] overflow-y-auto py-6">
           {q.trim().length < 2 ? (
-            <div className="space-y-2 text-[15px] text-paper/60">
+            <div className="text-[15px] text-paper/60">
               <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-amber2">Популярные запросы</p>
               {["Сварочное производство", "Расписание", "Общежитие", "Приёмная комиссия", "Профессионалитет"].map((s) => (
                 <button
@@ -443,23 +445,31 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             <ul>
               {results.map((r, i) => (
                 <li key={i} className="border-b border-paper/10">
-                  <a
-                    href={r.href}
-                    onClick={(e) => {
-                      if (r.href.startsWith("#")) {
-                        e.preventDefault();
-                        onClose();
-                        setTimeout(() => goAnchor(r.href), 80);
-                      }
-                    }}
-                    className="group flex items-center justify-between gap-4 py-3.5 transition-colors hover:text-amber2"
-                  >
-                    <span className="min-w-0">
-                      <span className="mr-3 font-mono text-[10.5px] uppercase tracking-widest text-amber2/80">{r.type}</span>
-                      <span className="text-[15px] font-medium">{r.label}</span>
-                    </span>
-                    <IconArrowUpRight className="h-4 w-4 shrink-0 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-                  </a>
+                  {r.to ? (
+                    <button
+                      onClick={() => goTo(r)}
+                      className="group flex w-full items-center justify-between gap-4 py-3.5 text-left transition-colors hover:text-amber2"
+                    >
+                      <span className="min-w-0">
+                        <span className="mr-3 font-mono text-[10.5px] uppercase tracking-widest text-amber2/80">{r.type}</span>
+                        <span className="text-[15px] font-medium">{r.label}</span>
+                      </span>
+                      <IconArrowUpRight className="h-4 w-4 shrink-0 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                    </button>
+                  ) : (
+                    <a
+                      href={r.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group flex items-center justify-between gap-4 py-3.5 transition-colors hover:text-amber2"
+                    >
+                      <span className="min-w-0">
+                        <span className="mr-3 font-mono text-[10.5px] uppercase tracking-widest text-amber2/80">{r.type}</span>
+                        <span className="text-[15px] font-medium">{r.label}</span>
+                      </span>
+                      <IconArrowUpRight className="h-4 w-4 shrink-0 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -467,6 +477,48 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ================= Обёртка внутренних страниц ================= */
+
+export function PageShell({
+  index,
+  label,
+  title,
+  accent,
+  desc,
+  children,
+}: {
+  index: string;
+  label: string;
+  title: string;
+  accent: string;
+  desc?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <section className="relative overflow-hidden bg-navy text-paper">
+      <div className="bg-blueprint pointer-events-none absolute inset-0" />
+      <div
+        className="pointer-events-none absolute -right-4 bottom-0 hidden select-none font-display text-[7rem] leading-none font-black text-stroke xl:block"
+        style={{ writingMode: "vertical-rl" }}
+      >
+        {index}
+      </div>
+      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 md:pb-16">
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-paper/50">
+          <Link to="/" className="transition-colors hover:text-amber2">Главная</Link>
+          <span className="mx-2 text-accent">/</span>
+          <span className="text-amber2">{label}</span>
+        </p>
+        <h1 className="mt-5 max-w-3xl font-display text-[clamp(2rem,5.5vw,3.4rem)] font-black leading-[1.02] tracking-tight">
+          {title} <span className="text-accent">{accent}</span>
+        </h1>
+        {desc && <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-paper/70 md:text-base">{desc}</p>}
+        {children && <div className="mt-8">{children}</div>}
+      </div>
+    </section>
   );
 }
 
@@ -508,10 +560,10 @@ export function Footer() {
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-amber2">Разделы</p>
           <ul className="space-y-2.5 text-[14px]">
             {NAV.map((n) => (
-              <li key={n.href}>
-                <a href={n.href} onClick={(e) => navClick(e, n.href)} className="text-paper/70 transition-colors hover:text-amber2">
+              <li key={n.path}>
+                <Link to={n.path} className="text-paper/70 transition-colors hover:text-amber2">
                   {n.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -557,9 +609,9 @@ export function Footer() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-[12.5px] text-paper/50 sm:px-6">
           <p>© 2026 ГБПОУ МО «Серпуховский колледж». При использовании материалов ссылка обязательна.</p>
           <div className="flex gap-5">
-            <a href="https://serp-koll.ru/svedeniya-ob-obrazovatelnoj-organizatsii/dokumenty" target="_blank" rel="noreferrer" className="transition-colors hover:text-amber2">
+            <Link to="/svedeniya" className="transition-colors hover:text-amber2">
               Сведения об организации
-            </a>
+            </Link>
             <a href="https://mo.mosreg.ru/" target="_blank" rel="noreferrer" className="transition-colors hover:text-amber2">
               Министерство образования МО
             </a>
