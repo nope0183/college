@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ADMISSION_LINKS,
   CONTACTS,
@@ -20,11 +21,6 @@ import {
 } from "../ui";
 
 /* ================= Специальности ================= */
-
-function smoothScroll(sel: string) {
-  const prm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  document.querySelector(sel)?.scrollIntoView({ behavior: prm ? "auto" : "smooth" });
-}
 
 export function Programs() {
   const [field, setField] = useState<FieldKey | "all">("all");
@@ -82,12 +78,8 @@ export function Programs() {
             const Icon = ICONS[p.icon];
             return (
               <Reveal key={p.code} delay={(i % 3) * 80}>
-                <a
-                  href="#steps"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    smoothScroll("#steps");
-                  }}
+                <Link
+                  to="/abiturientu"
                   className="group relative flex h-full flex-col overflow-hidden rounded-sm border border-line bg-paper p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent hover:shadow-xl hover:shadow-navy/10"
                 >
                   <span className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-500 group-hover:scale-x-100" />
@@ -114,7 +106,7 @@ export function Programs() {
                   <span className="mt-4 flex items-center gap-2 font-mono text-[11.5px] font-semibold uppercase tracking-[0.14em] text-accent opacity-0 transition-all duration-300 group-hover:opacity-100">
                     Как поступить <IconArrowRight className="h-3.5 w-3.5" />
                   </span>
-                </a>
+                </Link>
               </Reveal>
             );
           })}

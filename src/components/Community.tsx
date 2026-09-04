@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { MouseEvent } from "react";
+import { Link } from "react-router-dom";
 import {
   AUDIENCES,
   CAMPUSES,
@@ -32,24 +34,20 @@ export function News() {
           label="Жизнь колледжа"
           title={<>Новости и <span className="text-accent">события</span></>}
           right={
-            <a
-              href="https://serp-koll.ru/home/novosti"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to="/novosti"
               className="group hidden items-center gap-2.5 rounded border border-line bg-card px-5 py-3 font-mono text-[12px] font-semibold uppercase tracking-wider text-ink transition-all hover:-translate-y-0.5 hover:border-accent hover:text-accent md:flex"
             >
               Все новости
               <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </a>
+            </Link>
           }
         />
 
         <div className="mt-12 grid gap-6 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">
-            <a
-              href="https://serp-koll.ru/home/novosti"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to={`/novosti/${featured.id}`}
               className="group block h-full overflow-hidden rounded-sm border border-line bg-card transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-xl hover:shadow-navy/10"
             >
               {featured.img && (
@@ -75,16 +73,14 @@ export function News() {
                   <IconArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
                 </span>
               </div>
-            </a>
+            </Link>
           </Reveal>
 
           <div className="flex flex-col gap-4 lg:col-span-5">
             {rest.map((n, i) => (
               <Reveal key={n.id} delay={i * 80}>
-                <a
-                  href="https://serp-koll.ru/home/novosti"
-                  target="_blank"
-                  rel="noreferrer"
+                <Link
+                  to={`/novosti/${n.id}`}
                   className="group flex items-center gap-5 rounded-sm border border-line bg-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent"
                 >
                   {n.img ? (
@@ -106,17 +102,15 @@ export function News() {
                     </h4>
                   </div>
                   <IconArrowUpRight className="ml-auto h-4.5 w-4.5 shrink-0 -translate-x-1 text-ink2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:text-accent group-hover:opacity-100" />
-                </a>
+                </Link>
               </Reveal>
             ))}
-            <a
-              href="https://serp-koll.ru/home/novosti"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to="/novosti"
               className="mt-auto flex items-center justify-center gap-2.5 rounded border border-dashed border-line py-3.5 font-mono text-[12px] font-semibold uppercase tracking-wider text-ink2 transition-colors hover:border-accent hover:text-accent md:hidden"
             >
               Все новости <IconArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -190,8 +184,17 @@ export function Audiences() {
                   <a
                     key={l.label}
                     href={l.href}
-                    target="_blank"
-                    rel="noreferrer"
+                    {...(l.href.startsWith("#")
+                      ? {
+                          onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+                            e.preventDefault();
+                            const prm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                            document
+                              .querySelector(l.href)
+                              ?.scrollIntoView({ behavior: prm ? "auto" : "smooth" });
+                          },
+                        }
+                      : { target: "_blank", rel: "noreferrer" })}
                     className="group flex items-center justify-between gap-4 border-b border-paper/12 py-3.5 transition-all duration-300 hover:border-amber2 hover:pl-2"
                     style={{ transitionDelay: `${i * 10}ms` }}
                   >
